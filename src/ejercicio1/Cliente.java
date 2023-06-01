@@ -14,7 +14,7 @@ public class Cliente {
         String ruta = sc.nextLine();
         try {
             InetAddress direccion = InetAddress.getLocalHost();
-            Socket socketCliente = new Socket(direccion, 50000);
+            Socket socketCliente = new Socket(direccion, 1500);
 
             System.out.println("Abriendo flujos de entrada y salida");
             OutputStream os = socketCliente.getOutputStream();
@@ -25,7 +25,20 @@ public class Cliente {
             BufferedWriter bw = new BufferedWriter(osw);
 
             bw.write(ruta);
+            bw.newLine();
+            bw.flush();
 
+            InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+            BufferedReader br = new BufferedReader(isr);
+            System.out.println("Contenido del fichero: " + br.readLine());
+
+            osw.close();
+            is.close();
+            os.close();
+            bw.close();
+            isr.close();
+            br.close();
+            socketCliente.close();
         }catch (Exception e){
             System.out.println("Error");
         }
