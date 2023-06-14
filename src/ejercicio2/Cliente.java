@@ -1,42 +1,37 @@
 package ejercicio2;
 
-import java.io.BufferedWriter;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.io.IOException;
+import java.net.*;
+import java.util.Random;
 
 public class Cliente {
     public static void main(String[] args) {
+        InetAddress direccion;
         try {
-            InetAddress direccion = InetAddress.getLocalHost();
-            Socket socketCliente = new Socket(direccion, 1500);
+            direccion = InetAddress.getLocalHost();
+            DatagramSocket socket = new DatagramSocket();
+            int num = 0;
+            String mensaje;
 
-            System.out.println("Abriendo flujos de entrada y salida");
-            OutputStream os = socketCliente.getOutputStream();
-            InputStream is = socketCliente.getInputStream();
-
-            System.out.println("Enviando mensaje al servidor");
-            OutputStreamWriter osw = new OutputStreamWriter(os,"UTF-8");
-            BufferedWriter bw = new BufferedWriter(osw);
-
-            for(int i=0;i<10000;i++){
-                bw.write("Mensaje: "+i);
-                bw.newLine();
-                bw.flush();
+            while (num<10000){
+                mensaje = "Mensaje: " + num;
+                byte[] buffer = mensaje.getBytes();
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, direccion, 100);
+                socket.send(packet);
+                num++;
             }
-            bw.write("FIN");
-            bw.flush();
-
-            osw.close();
-            is.close();
-            os.close();
-            bw.close();
-            socketCliente.close();
-
-        }catch (Exception e){
-
+            mensaje = "FIN";
+            byte[] buffer = mensaje.getBytes();
+            DatagramPacket packet = new DatagramPacket(buffer, buffer.length, direccion, 100);
+            socket.send(packet);
+            socket.close();
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
     }
 }
